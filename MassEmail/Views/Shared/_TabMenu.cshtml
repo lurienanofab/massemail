@@ -1,0 +1,144 @@
+﻿@using MassEmail.Models;
+
+@model MassEmailModel
+@{
+    IList<TabItem> tabs = new List<TabItem>();
+
+    if (Model.IsSelectedTab("admin"))
+    {
+        tabs.Add(Html.CreateTab("privilege", "By Privilege", true, false, Url.Action("Navigate", new { tab = "privilege" })));
+        tabs.Add(Html.CreateTab("community", "By Community", true, false, Url.Action("Navigate", new { tab = "community" })));
+        tabs.Add(Html.CreateTab("manager", "By Manager", true, false, Url.Action("Navigate", new { tab = "manager" })));
+        tabs.Add(Html.CreateTab("tools", "By Tool", true, false, Url.Action("Navigate", new { tab = "tools" })));
+        tabs.Add(Html.CreateTab("inlab", "Currently In Lab", true, false, Url.Action("Navigate", new { tab = "inlab" })));
+    }
+    else
+    {
+        tabs.Add(Html.CreateTab("privilege", "By Privilege", true, true));
+        tabs.Add(Html.CreateTab("community", "By Community", true, true));
+        tabs.Add(Html.CreateTab("manager", "By Manager", true, true));
+        tabs.Add(Html.CreateTab("tools", "By Tool", true, true));
+        tabs.Add(Html.CreateTab("inlab", "Currently In Lab", true, true));
+    }
+
+    tabs.Add(Html.CreateTab("admin", "Admin", Model.IsAdmin || Model.IsSelectedTab("admin"), false, Url.Action("Admin")));
+}
+
+<ul class="nav nav-tabs mt-4" id="tab1" role="tablist" style="display: none;">
+    @foreach (var tab in tabs)
+    {
+        if (tab.Visible)
+        {
+            <li class="nav-item">
+                @if (tab.Toggle)
+                {
+                    <a class="@tab.CssClass" id="@tab.ID" data-toggle="tab" href="@tab.Href" role="tab" aria-controls="@tab.Name" aria-selected="@tab.Selected" data-name="@tab.Name">@tab.Text</a>
+                }
+                else
+                {
+                    <a class="@tab.CssClass" id="@tab.ID" href="@tab.Href" role="tab" aria-controls="@tab.Name" aria-selected="@tab.Selected" data-name="@tab.Name">@tab.Text</a>
+                }
+            </li>
+        }
+    }
+</ul>
+
+<div class="tab-content mt-1" id="tabcontent1" style="display: none;">
+    @if (tabs.IsVisible("privilege") && !Model.IsSelectedTab("admin"))
+    {
+        <div class="@Html.GetTabPaneCssClass("privilege")" id="privilege" role="tabpanel" aria-labelledby="privilege-tab">
+            <div class="row p-2">
+                <div class="col-5">
+                    @foreach (var p in Model.Privs)
+                    {
+                        <div style="width: 200px; display: inline-block;">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="@p.PrivFlag" value="@Convert.ToInt32(p.PrivFlag)">
+                                <label class="form-check-label" for="@p.PrivFlag" title="@p.PrivDescription">@p.PrivType</label>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (tabs.IsVisible("community") && !Model.IsSelectedTab("admin"))
+    {
+        <div class="@Html.GetTabPaneCssClass("community")" id="community" role="tabpanel" aria-labelledby="community-tab">
+            <div class="row p-2">
+                <div class="col-5">
+                    @foreach (var c in Model.Communities)
+                    {
+                        <div style="width: 200px; display: inline-block;">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="community_@c.CommunityFlag" value="@c.CommunityFlag">
+                                <label class="form-check-label" for="community_@c.CommunityFlag">@c.CommunityName</label>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (tabs.IsVisible("manager") && !Model.IsSelectedTab("admin"))
+    {
+        <div class="@Html.GetTabPaneCssClass("manager")" id="manager" role="tabpanel" aria-labelledby="manager-tab">
+            <div class="row p-2">
+                <div class="col-5">
+                    <div class="form-group">
+                        <label for="ManagerClientID">Select manager:</label>
+                        @Html.DropDownList("ManagerClientID", Model.Managers.Select(x => new SelectListItem { Text = x.Text, Value = x.Value }), new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (tabs.IsVisible("tools") && !Model.IsSelectedTab("admin"))
+    {
+        <div class="@Html.GetTabPaneCssClass("tools")" id="tools" role="tabpanel" aria-labelledby="tools-tab">
+            <div class="row p-2">
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="Resources">Select tools:</label>
+                        <select multiple class="form-control" id="Resources" name="Resources" style="height: 200px;">
+                            @foreach (var tool in Model.Tools)
+                            {
+                                <option value="@tool.Value">@tool.Text</option>
+                            }
+                        </select>
+                        <small class="form-text text-muted">Press the Ctrl key to select multiple.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (tabs.IsVisible("inlab") && !Model.IsSelectedTab("admin"))
+    {
+        <div class="@Html.GetTabPaneCssClass("inlab")" id="inlab" role="tabpanel" aria-labelledby="inlab-tab">
+            <div class="row p-2">
+                <div class="col-3">
+                    @foreach (var area in Model.Areas)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="@area.AreaID" id="area_@area.AreaID">
+                            <label class="form-check-label" for="area_@area.AreaID">
+                                @area.RoomDisplayName
+                            </label>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (tabs.IsVisible("admin"))
+    {
+        <div class="@Html.GetTabPaneCssClass("admin")" id="admin" role="tabpanel" aria-labelledby="admin-tab">
+            <div class="row p-2"><!-- intentionally left blank --></div>
+        </div>
+    }
+</div>

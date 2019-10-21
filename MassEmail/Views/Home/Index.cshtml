@@ -1,0 +1,276 @@
+﻿@using MassEmail.Models;
+
+@model HomeModel
+@{
+    ViewBag.Title = "Mass Email";
+    List<string> errors = ViewBag.Errors;
+    string message = ViewBag.Message;
+}
+
+<h4>Send Email to User Groups</h4>
+
+@Html.Partial("_TabMenu", Model)
+
+<hr class="mt-0" />
+
+@using (Html.BeginForm("Index", "Home", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data", id = "form1" }))
+{
+    @Html.HiddenFor(x => x.SelectedTab, new { @class = "selected-tab" })
+    @Html.HiddenFor(x => x.SelectedValues, new { @class = "selected-values" })
+
+    <div class="form-group row">
+        <label for="From" class="col-sm-1 col-form-label">From</label>
+        <div class="col-sm-3">
+            <input type="text" class="form-control" id="From" name="From" value="@Model.From">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="CC" class="col-sm-1 col-form-label">CC</label>
+        <div class="col-sm-3">
+            <input type="text" class="form-control" id="CC" name="CC" value="@Model.CC" placeholder="Please type any CC email addresses here">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="DisplayName" class="col-sm-1 col-form-label">Display Name</label>
+        <div class="col-sm-3">
+            <input type="text" class="form-control" id="DisplayName" name="DisplayName" value="@Model.DisplayName">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="Subject" class="col-sm-1 col-form-label">Subject</label>
+        <div class="col-sm-3">
+            <input type="text" class="form-control" id="Subject" name="Subject" value="@Model.Subject" placeholder="You must have a subject">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="Attachments" class="col-sm-1 col-form-label">Attachments</label>
+        <div class="col-sm-3">
+            <p class="form-control-plaintext">
+                <input type="file" id="Attachments" name="Attachments" multiple>
+            </p>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="Body" class="col-sm-1 col-form-label">Body</label>
+        <div class="col-sm-6">
+            <textarea class="form-control" id="Body" name="Body" placeholder="Please type the body here" style="height: 200px; resize: both;">@Model.Body</textarea>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="offset-1 col-6">
+            <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#recipeints-modal">View Recipients</button>
+            <button type="submit" class="btn btn-outline-primary">Send Email</button>
+            @if (errors.Count > 0)
+            {
+                <div class="alert alert-danger mt-3" role="alert">
+                    @if (errors.Count == 1)
+                    {
+                        <span>@errors[0]</span>
+                    }
+                    else
+                    {
+                        <ul>
+                            @foreach (var e in errors)
+                            {
+                                <li>@e</li>
+                            }
+                        </ul>
+                    }
+                </div>
+            }
+            else if (!string.IsNullOrEmpty(message))
+            {
+                <div class="alert alert-success mt-3" role="alert">@message</div>
+            }
+        </div>
+    </div>
+}
+
+<div class="modal fade" id="recipeints-modal" tabindex="-1" role="dialog" aria-labelledby="recipeints-modal-label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="recipeints-modal-label">Recipients</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img class="loader" src="@Url.Content("//ssel-apps.eecs.umich.edu/static/images/ajax-loader.gif")" />
+                <textarea class="form-control emails" spellcheck="false" style="height: 200px; display: none;"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        setValues();
+
+        function getSelectedValues() {
+            var val = $(".selected-values").val();
+            if (val)
+                return JSON.parse(val);
+            else
+                return [];
+        }
+
+        function getSelectedTab() {
+            return $("#tab1 .nav-link.active").data('name');
+        }
+
+        function setValues() {
+            var values = getSelectedValues();
+
+            if (values.length == 0)
+                return;
+
+            var tab = getSelectedTab();
+            var val = 0;
+
+            switch (tab) {
+                case 'privilege':
+                    $("#privilege .form-check-input").each(function () {
+                        val = parseInt($(this).val());
+                        if (values.indexOf(val) > -1)
+                            $(this).prop("checked", true);
+                    });
+                    break;
+                case 'community':
+                    $("#community .form-check-input").each(function () {
+                        val = parseInt($(this).val());
+                        if (values.indexOf(val) > -1)
+                            $(this).prop("checked", true);
+                    });
+                    break;
+                case 'manager':
+                    val = values[0];
+                    $("#manager select option[value=" + val + "]").prop("selected", true);
+                    break;
+                case 'tools':
+                    for (var i = 0; i < values.length; i++) {
+                        val = values[i];
+                        $("#tools select option[value=" + val + "]").prop("selected", true);
+                    }
+                    break;
+                case 'inlab':
+                    $("#inlab .form-check-input").each(function () {
+                        val = parseInt($(this).val());
+                        if (values.indexOf(val) > -1)
+                            $(this).prop("checked", true);
+                    });
+                    break;
+            }
+        }
+
+        function getValues(tab) {
+            var values = [];
+            var val = 0;
+
+            switch (tab) {
+                case 'privilege':
+                    $("#privilege .form-check-input:checked").each(function () {
+                        val = parseInt($(this).val());
+                        values.push(val);
+                    });
+                    break;
+                case 'community':
+                    $("#community .form-check-input:checked").each(function () {
+                        val = parseInt($(this).val());
+                        values.push(val);
+                    });
+                    break;
+                case 'manager':
+                    val = parseInt($("#manager select").val());
+                    values.push(val);
+                    break;
+                case 'tools':
+                    values = $.map($("#tools select").val(), function (v) { return parseInt(v); });
+                    break;
+                case 'inlab':
+                    $("#inlab .form-check-input:checked").each(function () {
+                        val = parseInt($(this).val());
+                        values.push(val);
+                    });
+                    break;
+            }
+
+            return values;
+        }
+
+        function combine(values) {
+            return values.reduce(function (x, val) {
+                return x | val;
+            });
+        }
+
+        function getData() {
+            var data = {
+                "Privs": 0,
+                "Communities": 0,
+                "Manager": 0,
+                "Tools": [],
+                "InLab": []
+            };
+
+            var selectedTab = getSelectedTab();
+
+            var values = getValues(selectedTab);
+
+            switch (selectedTab) {
+                case 'privilege':
+                    data.Privs = combine(values);
+                    break;
+                case 'community':
+                    data.Communities = combine(values);
+                    break;
+                case 'manager':
+                    data.Manager = values[0];
+                    break;
+                case 'tools':
+                    data.Tools = values;
+                    break;
+                case 'inlab':
+                    data.InLab = values;
+                    break;
+            }
+
+            return data;
+        }
+
+        $("#recipeints-modal").on("hidden.bs.modal", function (e) {
+            var modal = $(this);
+            $(".modal-body .loader", modal).show();
+            $(".modal-body .emails", modal).val('').hide();
+        }).on("shown.bs.modal", function (e) {
+            var data = getData();
+
+            var modal = $(this);
+
+            $.ajax({
+                "url": '@Url.Action("Recipients", "Ajax")',
+                "method": "POST",
+                "contentType": "application/json",
+                "dataType": "json",
+                "data": JSON.stringify(data)
+            }).done(function (data) {
+                var emails = $.map(data, function (x) { return x.Email });
+                $(".modal-body .loader", modal).hide();
+                $(".modal-body .emails", modal).val(emails.join('\n')).show();
+            });
+        });
+
+        $('#tab1 a[data-toggle="tab"]').on("shown.bs.tab", function (e) {
+            var selectedTab = $(e.target).data('name');
+            $(".selected-tab").val(selectedTab);
+        });
+
+        $("#form1").on("submit", function (e) {
+            var values = getValues(getSelectedTab());
+            $(".selected-values").val(JSON.stringify(values));
+        })
+    </script>
+}

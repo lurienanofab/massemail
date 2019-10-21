@@ -1,0 +1,102 @@
+﻿@using MassEmail.Models;
+
+@model AdminModel
+@{
+    ViewBag.Title = "Admin";
+    string buttonText = Model.EditEmailID > 0 ? "Save" : "Add";
+    string errmsg = ViewBag.ErrorMessage;
+}
+
+<h4>Mass Email Admin</h4>
+
+@Html.Partial("_TabMenu", Model)
+
+
+@if (Model.IsAdmin)
+{
+    <div class="row">
+        <div class="col-6">
+            <h5>Invalid Email Address List</h5>
+
+            @if (!string.IsNullOrEmpty(errmsg))
+            {
+                <div class="alert alert-danger mt-4" role="alert">@errmsg</div>
+            }
+
+            <div class="mt-4 mb-4">
+                @using (Html.BeginForm("Admin", "Home", FormMethod.Post, new { @class = "mb-2" }))
+                {
+                    @Html.HiddenFor(x => x.EditEmailID)
+                    <div class="form-row">
+                        <div class="col">
+                            @Html.TextBoxFor(x => x.EditDisplayName, new { @class = "form-control", placeholder = "Name" })
+                        </div>
+                        <div class="col">
+                            @Html.TextBoxFor(x => x.EditEmailAddress, new { @class = "form-control", placeholder = "Email" })
+                        </div>
+                        <div class="col">
+                            <button type="submit" class="btn btn-outline-primary">@buttonText</button>
+                        </div>
+                    </div>
+                }
+
+                <label class="ml-1">
+                    @Html.CheckBox("ShowDeleted", Model.ShowDeleted, new { @class = "show-deleted" }) Show Deleted
+                </label>
+            </div>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th style="width: 240px;">Name</th>
+                        <th>Email</th>
+                        <th style="width: 140px;">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var i in Model.InvalidEmails)
+                    {
+                        <tr class="@(i.IsActive ? "active" : "inactive")">
+                            <td>@i.DisplayName</td>
+                            <td>@i.EmailAddress</td>
+                            <td class="text-right">
+                                @if (i.IsActive)
+                                {
+                                    <div>
+                                        @Html.ActionLink("modify", "Admin", new { emailId = i.EmailID }) |
+                                        @Html.ActionLink("delete", "AdminInvalidEmailCommand", new { command = "delete", emailId = i.EmailID })
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div>
+                                        @Html.ActionLink("undelete", "AdminInvalidEmailCommand", new { command = "undelete", emailId = i.EmailID })
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger" role="alert">
+        You do not have permission to access this page.
+    </div>
+}
+
+<hr />
+
+@section scripts{
+    <script>
+        $('#tab1 a[id="admin-tab"]').tab('show');
+
+        $(".show-deleted").on("change", function (e) {
+            var active = $(this).prop("checked") ? "false" : "true";
+            window.location = '@Url.Action("Admin")?active=' + active;
+        })
+    </script>
+}

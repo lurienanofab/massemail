@@ -1,0 +1,39 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="~/Content/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <style>
+        h4 {
+            color: #cc6600;
+        }
+    </style>
+
+    @RenderSection("styles", false)
+
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+    <div class="container-fluid mt-4">
+        @RenderBody()
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="~/Content/jquery/3.4.1/jquery-3.4.1.min.js"></script>
+    <script src="~/Content/popper/1.15.0/popper.min.js"></script>
+    <script src="~/Content/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    @RenderSection("scripts", false)
+
+    <script>
+        $("#tab1").show();
+        $("#tabcontent1").show();
+    </script>
+</body>
+</html>
