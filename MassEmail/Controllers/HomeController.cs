@@ -1,6 +1,6 @@
-﻿using LNF.Models;
-using LNF.Models.Data;
-using LNF.Models.Mail;
+﻿using LNF;
+using LNF.Data;
+using LNF.Mail;
 using MassEmail.Models;
 using Newtonsoft.Json;
 using System;
@@ -104,7 +104,7 @@ namespace MassEmail.Controllers
                         args.Attachments = guid;
                     }
 
-                    var sent = Provider.Mail.MassEmail.Send(args);
+                    var sent = Provider.Mail.SendMassEmail(args);
 
                     ViewBag.Message = $"Mail sent OK! Emails sent: {sent}";
                 }
@@ -146,7 +146,7 @@ namespace MassEmail.Controllers
         [HttpGet, Route("admin/invalid-email/{command}")]
         public ActionResult AdminInvalidEmailCommand(string command, int emailId)
         {
-            bool value = command == "delete" ? false : true;
+            bool value = command != "delete";
             Provider.Mail.MassEmail.SetInvalidEmailActive(emailId, value);
             return RedirectToAction("Admin");
         }

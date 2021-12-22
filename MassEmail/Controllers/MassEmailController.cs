@@ -1,5 +1,5 @@
-﻿using LNF.Models;
-using LNF.Models.Data;
+﻿using LNF;
+using LNF.Data;
 using System.Web.Mvc;
 
 namespace MassEmail.Controllers

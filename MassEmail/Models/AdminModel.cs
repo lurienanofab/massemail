@@ -1,4 +1,4 @@
-﻿using LNF.Models.Mail;
+﻿using LNF.Mail;
 using System.Collections.Generic;
 
 namespace MassEmail.Models

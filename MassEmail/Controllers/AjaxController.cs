@@ -1,5 +1,5 @@
-﻿using LNF.Models;
-using LNF.Models.Mail;
+﻿using LNF;
+using LNF.Mail;
 using System.Linq;
 using System.Web.Mvc;
 

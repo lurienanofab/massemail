@@ -89,7 +89,7 @@
                 <div class="col-5">
                     <div class="form-group">
                         <label for="ManagerClientID">Select manager:</label>
-                        @Html.DropDownList("ManagerClientID", Model.Managers.Select(x => new SelectListItem { Text = x.Text, Value = x.Value }), new { @class = "form-control" })
+                        @Html.DropDownList("ManagerClientID", Model.Managers.Select(x => new SelectListItem { Text = x.Text, Value = x.Value.ToString() }), new { @class = "form-control" })
                     </div>
                 </div>
             </div>
